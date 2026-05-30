@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      .scroll-container::-webkit-scrollbar { width: 6px; }
+      .scroll-container::-webkit-scrollbar-track { background: #f1f1f1; }
+      .scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+  </head>
+  <body class="bg-gray-50 font-sans p-4 flex justify-center items-center min-h-screen">
+
+    <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-md flex flex-col h-[550px]">
+      
+      <div class="mb-4 flex justify-between items-center border-b border-gray-100 pb-3">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800">My Predictions</h2>
+          <p id="user-email" class="text-xs text-gray-500 mt-0.5">Loading history...</p>
+        </div>
+        <button onclick="goToForm()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-medium transition">
+          Back
+        </button>
+      </div>
+
+      <div id="history-container" class="scroll-container flex-1 overflow-y-auto pr-1 space-y-3">
+        <p class="text-gray-400 text-center py-8 text-sm">Fetching your history...</p>
+      </div>
+      
+    </div>
+
+    <script>
+      window.onload = function() {
+        // Fetch current authenticated user's email
+        google.script.run.withSuccessHandler(email => {
+          document.getElementById('user-email').innerText = email;
+        }).getUserEmail();
+
+        // Load user data history
+        loadUserHistory();
+      };
+
+      function loadUserHistory() {
+        const container = document.getElementById('history-container');
+        
+        google.script.run.withSuccessHandler(history => {
+          container.innerHTML = '';
+          
+          if (history.length === 0) {
+            container.innerHTML = '<p class="text-gray-400 text-center py-8 text-sm">You haven\'t made any predictions yet.</p>';
+            return;
+          }
+
+          history.forEach(item => {
+            const row = document.createElement('div');
+            row.className = "p-3 border border-gray-100 rounded-lg bg-gray-50/50 flex flex-col gap-1.5";
+            row.innerHTML = `
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-medium text-gray-400">${item.date}</span>
+                <span class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-mono">${item.time}</span>
+              </div>
+              <div class="flex justify-between items-center mt-0.5">
+                <span class="text-sm font-semibold text-gray-700 max-w-[70%] truncate">${item.match}</span>
+                <span class="text-sm font-bold bg-white px-2 py-0.5 border border-gray-200 rounded text-gray-800 shadow-2xs">
+                  ${item.score1} - ${item.score2}
+                </span>
+              </div>
+            `;
+            container.appendChild(row);
+          });
+        }).getUserPredictionHistory();
+      }
+
+      function goToForm() {
+        google.script.run.withSuccessHandler(html => {
+          document.open();
+          document.write(html);
+          document.close();
+        }).getPageHtml('Index');
+      }
+    </script>
+  </body>
+</html>
