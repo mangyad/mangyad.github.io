@@ -1,5 +1,9 @@
+var url_id = "1Pfh4FX-LY8G_aPAO8AZhiNwH8QHeSZhLdRB3GTW2vQ0";
+var ss = SpreadsheetApp.openById(url_id);
+
+
 function doGet() {
-  return HtmlService.createTemplateFromFile('index')
+  return HtmlService.createTemplateFromFile('Index')
     .evaluate()
     .setTitle('Match Predictor')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
@@ -19,7 +23,7 @@ function getPageHtml(pageName) {
  * Fetches unique dates from 'schedule' tab where 'Display' is TRUE 
  */
 function getAvailableDates() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('schedule');
+  const sheet = ss.getSheetByName('schedule');
   if (!sheet) return [];
   const data = sheet.getDataRange().getValues();
   const headers = data[0].map(h => String(h).toLowerCase().trim());
@@ -42,7 +46,7 @@ function getAvailableDates() {
  * Fetches visible matches for a specific date 
  */
 function getMatchesForDate(targetDateStr) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('schedule');
+  const sheet = ss.getSheetByName('schedule');
   if (!sheet) return [];
   const data = sheet.getDataRange().getValues();
   const headers = data[0].map(h => String(h).toLowerCase().trim());
@@ -68,7 +72,7 @@ function getMatchesForDate(targetDateStr) {
  */
 function submitPredictions(predictions) {
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    //const ss = SpreadsheetApp.getActiveSpreadsheet();
     let sheet = ss.getSheetByName('predictions');
     if (!sheet) {
       sheet = ss.insertSheet('predictions');
@@ -119,7 +123,7 @@ function submitPredictions(predictions) {
  * History view logic 
  */
 function getUserPredictionHistory() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  //const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName('predictions');
   if (!sheet) return [];
   const data = sheet.getDataRange().getValues();
@@ -153,7 +157,7 @@ function getUserPredictionHistory() {
  * Fetching existing scores to pre-fill the UI 
  */
 function getExistingPredictionsForUser(matchNames) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  //const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName('predictions');
   if (!sheet) return {};
   const data = sheet.getDataRange().getValues();
